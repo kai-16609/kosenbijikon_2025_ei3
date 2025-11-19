@@ -1,51 +1,164 @@
-import { DeployButton } from "@/components/deploy-button";
-import { EnvVarWarning } from "@/components/env-var-warning";
-import { AuthButton } from "@/components/auth-button";
-import { Hero } from "@/components/hero";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/lib/utils";
-import Link from "next/link";
+"use client";
+
+import { useState } from 'react';
+import { HomeTab } from '@/components/home-tab';
+import { PostTab } from '@/components/post-tab';
+import { FeedTab } from '@/components/feed-tab';
+import { ProfileTab } from '@/components/profile-tab';
+import { BottomNav } from '@/components/bottom-nav';
+import { SignInPage } from '@/components/sign-in-page';
+import { SignUpPage } from '@/components/sign-up-page';
+import { Post, User } from '@/lib/types';
 
 export default function Home() {
+  const [user, setUser] = useState<User | null>(null);
+  const [authView, setAuthView] = useState<'signin' | 'signup'>('signin');
+  const [activeTab, setActiveTab] = useState<'home' | 'post' | 'feed' | 'profile'>('home');
+  const [myPosts, setMyPosts] = useState<Post[]>([
+    {
+      id: '1',
+      content: '今日も頑張りました！継続は力なり。',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
+      target: '自分',
+      category: '成長',
+    },
+    {
+      id: '2',
+      content: '3日目達成！調子が良くなってきた。',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48),
+      target: '自分',
+      category: '励まし',
+    },
+  ]);
+  const [allPosts, setAllPosts] = useState<Post[]>([
+    {
+      id: 'a1',
+      content: '100日達成！みなさんもがんばってください！',
+      timestamp: new Date(Date.now() - 1000 * 60 * 30),
+      author: 'ユーザーA',
+      target: '自分',
+      category: '成長',
+    },
+    {
+      id: 'a2',
+      content: '今日から始めます。よろしくお願いします。',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60),
+      author: 'ユーザーB',
+      target: '友人',
+      category: '励まし',
+    },
+    {
+      id: 'a3',
+      content: '50日継続中！習慣化できてきました。',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+      author: 'ユーザーC',
+      target: '家族',
+      category: 'サポート',
+    },
+    {
+      id: 'a4',
+      content: '雨の日も続けています。',
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
+      author: 'ユーザーD',
+      target: '自分',
+      category: '日常',
+    },
+  ]);
+
+  const handleSignIn = (email: string, password: string) => {
+    // デモ版：簡易的なサインイン処理
+    setUser({ 
+      name: email.split('@')[0], 
+      email,
+      avatar: '😊' 
+    });
+  };
+
+  const handleSignUp = (name: string, email: string, password: string) => {
+    // デモ版：簡易的なサインアップ処理
+    setUser({ 
+      name, 
+      email,
+      avatar: '😊' 
+    });
+  };
+
+  const handleUpdateProfile = (name: string, avatar: string) => {
+    if (user) {
+      setUser({ ...user, name, avatar });
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setActiveTab('home');
+    setAuthView('signin');
+  };
+
+  const handleNewPost = (content: string, target: string, category: string) => {
+    const newPost: Post = {
+      id: Date.now().toString(),
+      content,
+      timestamp: new Date(),
+      target: target as Post['target'],
+      category: category as Post['category'],
+    };
+    setMyPosts([newPost, ...myPosts]);
+    
+    // みんなの投稿にも追加（あなたとして）
+    const newAllPost: Post = {
+      ...newPost,
+      author: user?.name || 'あなた',
+    };
+    setAllPosts([newAllPost, ...allPosts]);
+  };
+
+  // 認証されていない場合はサインイン/サインアップページを表示
+  if (!user) {
+    if (authView === 'signin') {
+      return (
+        <SignInPage
+          onSignIn={handleSignIn}
+          onSwitchToSignUp={() => setAuthView('signup')}
+        />
+      );
+    } else {
+      return (
+        <SignUpPage
+          onSignUp={handleSignUp}
+          onSwitchToSignIn={() => setAuthView('signin')}
+        />
+      );
+    }
+  }
+
   return (
-    <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col gap-20 items-center">
-        <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-          <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-            <div className="flex gap-5 items-center font-semibold">
-              <Link href={"/"}>Next.js Supabase Starter</Link>
-              <div className="flex items-center gap-2">
-                <DeployButton />
-              </div>
-            </div>
-            {!hasEnvVars ? <EnvVarWarning /> : <AuthButton />}
-          </div>
-        </nav>
-        <div className="flex-1 flex flex-col gap-20 max-w-5xl p-5">
-          <Hero />
-          <main className="flex-1 flex flex-col gap-6 px-4">
-            <h2 className="font-medium text-xl mb-4">Next steps</h2>
-            {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-          </main>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      {/* スマホ風の縦型レイアウト */}
+      <div className="w-full max-w-md h-[90vh] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+        {/* メインコンテンツエリア */}
+        <div className="flex-1 overflow-hidden">
+          {activeTab === 'home' && <HomeTab posts={myPosts} />}
+          {activeTab === 'post' && (
+            <PostTab 
+              onPost={handleNewPost} 
+              onPostComplete={() => setActiveTab('home')}
+            />
+          )}
+          {activeTab === 'feed' && <FeedTab posts={allPosts} />}
+          {activeTab === 'profile' && (
+            <ProfileTab
+              user={user}
+              onUpdateProfile={handleUpdateProfile}
+              onLogout={handleLogout}
+              totalPosts={myPosts.length}
+            />
+          )}
         </div>
 
-        <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
-          <p>
-            Powered by{" "}
-            <a
-              href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-              target="_blank"
-              className="font-bold hover:underline"
-              rel="noreferrer"
-            >
-              Supabase
-            </a>
-          </p>
-          <ThemeSwitcher />
-        </footer>
+        {/* 下部ナビゲーション */}
+        <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
-    </main>
+    </div>
   );
 }
