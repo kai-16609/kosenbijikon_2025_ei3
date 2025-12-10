@@ -8,7 +8,7 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "感謝日記",
+  title: "TUG - The unnamed gratitude",
   description: "毎日の感謝を記録して、幸せな習慣を",
 };
 

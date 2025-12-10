@@ -53,9 +53,9 @@ export function SignUpPage({ onSignUp, onSwitchToSignIn }: SignUpPageProps) {
             <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl mx-auto mb-4 flex items-center justify-center">
               <UserPlus className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl mb-2">アカウント作成</h1>
+            <h1 className="text-2xl font-bold mb-2">TUG</h1>
             <p className="text-sm text-gray-500">
-              感謝の習慣を今日から始めましょう
+              The unnamed gratitude
             </p>
           </div>
 
