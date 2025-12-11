@@ -65,7 +65,7 @@ export default function Home() {
     },
   ]);
 
-  const handleSignIn = (email: string, password: string) => {
+  const handleSignIn = (email: string, _password: string) => {
     // デモ版：簡易的なサインイン処理
     setUser({ 
       name: email.split('@')[0], 
@@ -74,7 +74,7 @@ export default function Home() {
     });
   };
 
-  const handleSignUp = (name: string, email: string, password: string) => {
+  const handleSignUp = (name: string, email: string, _password: string) => {
     // デモ版：簡易的なサインアップ処理
     setUser({ 
       name, 

@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import { User as UserType } from '@/lib/types';
-import { User, LogOut, Edit2, Check, X } from 'lucide-react';
+import { LogOut, Edit2, Check, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Label } from './ui/label';
 import { Card } from './ui/card';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import {
